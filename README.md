@@ -1,4 +1,4 @@
-# mwRESTScripts
+# mwRESTscripts
 Scripts to handle Mediawiki content, using the REST API.
 
 These scripts depend on the Snoopy PHP net client to simulate a browser. 
