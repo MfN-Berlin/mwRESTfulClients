@@ -6,9 +6,9 @@ These scripts depend on the [Snoopy PHP net client](http://sourceforge.net/proje
 ```
 /src - the sources
 /src/wrappers - classes to call the API using PHP
-/src/example.ini - an example configuration file. Copy this to create your own configuration.
-/src/exampleBasicImportCSV.php - A simple PHP script to import a spreadsheet into a wiki page.
-/src/exampleAdvancedImportCSV.php - Same as above, but can customize the result.
+/src/example.ini - an example configuration file. Copy this.
+/src/exampleBasicImportCSV.php - basic PHP script to import a spreadsheet.
+/src/exampleAdvancedImportCSV.php - same as above, but can customize the result.
 
 /test - unit tests 
 /test/testdata - data used for testing
@@ -20,12 +20,14 @@ Data will generally be presented as a table.
 
 ### Preparing the data
 Before the spreadsheet can be imported, please do the following:
+
 1. Export the spreadsheet into CSV format.
 2. Make sure the CSV is in UTF-8, else convert it, e.g. using Notepad.
 
 ### Preparing the page template
 The table created from the spreadsheet will be inserted into a mediawiki page. 
 Pages are formated using a template stored in a local file (the Mediawiki templating system is not required).
+
 1. To create your own page template, copy test/testdata/Test.tpl to e.g. src/page.tpl.
 2. Add the newly created .tpl file to Git ignore
 3. Edit the file to suit your requirements. 
@@ -47,6 +49,7 @@ See exampleAdvancedImportCSV.php for how to do this.
 
 ### Testing
 Tests are written using PHPUnit. Please run the tests, specially if you edit the source code.
+
 1. Get [PHP Unit](https://phpunit.de/)
 2. Copy example.ini as e.g. test.ini and edit it to suit your configuration. Add your configuration to Git ignore.
 4. In each test file, make sure the following settings are correct:
