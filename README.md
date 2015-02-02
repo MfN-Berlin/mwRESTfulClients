@@ -37,7 +37,6 @@ Pages are formated using a template stored in a local file (the Mediawiki templa
 2. Copy example.ini as e.g. config.ini and edit it to suit your configuration. Add your configuration to Git ignore.
 3. For a simple spreadsheet import, copy exampleBasicImportsCSV.php to e.g. runImportCSV.php
 4. In the newly created file, make sure the following settings are correct:
-  * The path to the Snoopy class (in the include statement)
   * The path to the CSV file
   * The path to the page template (a local file path, not a URL!)
   * The name of the page to be created
@@ -52,6 +51,4 @@ Tests are written using PHPUnit. Please run the tests, specially if you edit the
 
 1. Get [PHP Unit](https://phpunit.de/)
 2. Copy example.ini as e.g. test.ini and edit it to suit your configuration. Add your configuration to Git ignore.
-4. In each test file, make sure the following settings are correct:
-  * The path to the Snoopy class (in the include statement)
-  * The path to the test configuration file
+4. In each test file, make sure the path to the test configuration file is correct.
