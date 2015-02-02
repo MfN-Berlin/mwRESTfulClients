@@ -7,7 +7,8 @@ These scripts depend on the [Snoopy PHP net client](http://sourceforge.net/proje
 /src - the sources
 /src/wrappers - classes to call the API using PHP
 /src/example.ini - an example configuration file. Copy this to create your own configuration.
-/src/runImpportCSV.php - A simple PHP script, which imports a spreadsheet into a wiki page.
+/src/exampleBasicImportCSV.php - A simple PHP script to import a spreadsheet into a wiki page.
+/src/exampleAdvancedImportCSV.php - Same as above, but can customize the result.
 
 /test - unit tests 
 /test/testdata - data used for testing
@@ -15,7 +16,7 @@ These scripts depend on the [Snoopy PHP net client](http://sourceforge.net/proje
 
 ## Importing a spreadsheet into a wiki
 The CSV importer will create a new page or add a new version to an existing page (but only if data has changed!).
-Data will generally be presentaed as a table.
+Data will generally be presented as a table.
 
 ### Preparing the data
 Before the spreadsheet can be imported, please do the following:
@@ -24,7 +25,7 @@ Before the spreadsheet can be imported, please do the following:
 
 ### Preparing the page template
 The table created from the spreadsheet will be inserted into a mediawiki page. 
-Pages are formated using a template stored in a local file (the Mediawiki templating system is not required)
+Pages are formated using a template stored in a local file (the Mediawiki templating system is not required).
 1. To create your own page template, copy test/testdata/Test.tpl to e.g. src/page.tpl.
 2. Add the newly created .tpl file to Git ignore
 3. Edit the file to suit your requirements. 
