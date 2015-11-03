@@ -11,6 +11,7 @@ abstract class AbstractWrapper {
 	protected $baseURL;
 	protected $apiURL;
 	protected $loginVars;
+	protected $ini;
 	
 	/**
 	 * Initialize the class. Call from child class
@@ -22,13 +23,17 @@ abstract class AbstractWrapper {
 		$this->snoopy = $snoopy;
 		
 		// Read the .ini file
-		$ini = parse_ini_file( $configPath );
-		$this->baseURL = $ini[ 'baseURL' ];
-		$this->apiURL = $this->baseURL . "/api.php";
-		$this->loginVars[ 'lgname' ] = $ini[ 'wpName' ];
-		$this->loginVars[ 'lgpassword' ] = $ini[ 'wpPassword' ];
-		$this->loginVars[ 'format' ] = 'php';
+		$this->ini = parse_ini_file( $configPath );
 	}
+	
+	private function initLoginVars() {
+		$this->baseURL = $this->ini[ 'baseURL' ];
+		$this->apiURL = $this->baseURL . "/api.php";
+		$this->loginVars = array();
+		$this->loginVars[ 'lgname' ] = $this->ini[ 'wpName' ];
+		$this->loginVars[ 'lgpassword' ] = $this->ini[ 'wpPassword' ];
+		$this->loginVars[ 'format' ] = 'php';
+	} 
 	
 	/**
 	 * Login to the wiki via API
@@ -37,6 +42,7 @@ abstract class AbstractWrapper {
 	 * @see http://www.mediawiki.org/wiki/User:Patrick_Nagel/Login_with_snoopy_post-1.15.3
 	 */
 	public function login() {
+		$this->initLoginVars();
 		$this->loginVars[ 'action' ] = 'login';
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 		$this->snoopy->cookies = $this->getCookieHeaders( $this->snoopy->headers );
@@ -50,6 +56,7 @@ abstract class AbstractWrapper {
 	 * Logout
 	 */
 	public function logout() {
+		$this->initLoginVars();
 		$this->loginVars[ 'action' ] = 'logout';
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 	}
@@ -67,13 +74,14 @@ abstract class AbstractWrapper {
 	 * @throws exception when page already exists
 	 */
 	public function createPage( $title, $content ) {
-		if ( !$title ) throw new Exception( 'No page title.' );
+		if ( !$title ) throw new \Exception( 'No page title.' );
 		$title = rawurlencode( str_replace( " ", "_", $title) );
-
+		
 		// authenticate
+		$this->loginVars[ 'action' ] = 'login';
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 		$response = unserialize( trim( $this->snoopy->results ) );
-		if ( $response[ 'login' ][ 'result' ] != 'Success' ) throw new Exception( 'Could not authenticate' );
+		if ( $response[ 'login' ][ 'result' ] != 'Success' ) throw new \Exception( 'Could not authenticate '. serialize($response) );
 		
 		// get the page by title
 		$this->loginVars[ 'action' ] = 'query';
@@ -100,6 +108,18 @@ abstract class AbstractWrapper {
 		// Submit
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 		$finalResults = $this->snoopy->results;
+		
+		// Cleanup
+		unset($this->loginVars['prop']);
+		unset($this->loginVars['titles']);
+		unset($this->loginVars['intoken']);
+		unset($this->loginVars['title']);
+		unset($this->loginVars['text']);
+		unset($this->loginVars['summary']);
+		unset($this->loginVars['sectiontitle']);
+		unset($this->loginVars['basetimestamp']);
+		unset($this->loginVars['token']);
+		
 		return $finalResults;
 	}
 

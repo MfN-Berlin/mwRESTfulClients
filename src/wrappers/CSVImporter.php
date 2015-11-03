@@ -26,7 +26,7 @@ class CSVImporter extends PageCreator {
 		$header = null;
 		$data = array();
 		if ( ($handle = fopen( $path, "r" )) !== false ) {
-			while( ( $row = fgetcsv( $handle, 2000, ';' ) ) !== false ) {
+			while( ( $row = fgetcsv( $handle, 10000, ';' ) ) !== false ) {
 				if( !$header ) {
 					$header = $row;
 	
