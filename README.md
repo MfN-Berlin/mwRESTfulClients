@@ -1,4 +1,4 @@
-# mwRESTscripts
+# mwRESTfulClients
 Scripts to handle Mediawiki content, using the [RESTful API](http://www.mediawiki.org/wiki/API:Main_page).
 
 These scripts depend on the [Snoopy PHP net client](http://sourceforge.net/projects/snoopy/) to simulate a browser.
@@ -33,7 +33,9 @@ Pages are formated using a template stored in a local file (the Mediawiki templa
 3. Edit the file to suit your requirements. 
 
 ### Basic usage
-1. Get the [Snoopy PHP net client](http://sourceforge.net/projects/snoopy/). 
+1. Get Snoopy
+  * Download from [Snoopy PHP net client](http://sourceforge.net/projects/snoopy/).
+  * Put Snoopy.class.php into one of the directories specified in your php.ini include_path directive (e.g. /etc/php5/cli/php.ini).
 2. Copy example.ini as e.g. config.ini and edit it to suit your configuration. Add your configuration to Git ignore.
 3. For a simple spreadsheet import, copy exampleBasicImportsCSV.php to e.g. runImportCSV.php
 4. In the newly created file, make sure the following settings are correct:
