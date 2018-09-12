@@ -30,8 +30,17 @@ abstract class AbstractWrapper {
 		$this->baseURL = $this->ini[ 'baseURL' ];
 		$this->apiURL = $this->baseURL . "/api.php";
 		$this->loginVars = array();
-		$this->loginVars[ 'lgname' ] = $this->ini[ 'wpName' ];
-		$this->loginVars[ 'lgpassword' ] = $this->ini[ 'wpPassword' ];
+		// PRE 1.27
+            	// Login request, pre 1.27
+		// $this->loginVars[ 'lgname' ] = $this->ini[ 'wpName' ];
+		// $this->loginVars[ 'lgpassword' ] = $this->ini[ 'wpPassword' ];
+		// $this->loginVars[ 'format' ] = 'php';
+		// $this->loginVars[ 'action' ] = 'login';
+            	// POST 1.27
+            	// Get a login token
+		$this->loginVars[ 'action' ] = 'query';
+		$this->loginVars[ 'meta' ] = 'tokens';
+		$this->loginVars[ 'type' ] = 'login';
 		$this->loginVars[ 'format' ] = 'php';
 	} 
 	
@@ -42,13 +51,24 @@ abstract class AbstractWrapper {
 	 * @see http://www.mediawiki.org/wiki/User:Patrick_Nagel/Login_with_snoopy_post-1.15.3
 	 */
 	public function login() {
-		$this->initLoginVars();
-		$this->loginVars[ 'action' ] = 'login';
+		$this->baseURL = $this->ini[ 'baseURL' ];
+		$this->apiURL = $this->baseURL . "/api.php";
+		$this->loginVars = array();
+
+		// get a token
+		$this->loginVars[ 'action' ] = 'query';
+		$this->loginVars[ 'meta' ] = 'tokens';
+		$this->loginVars[ 'type' ] = 'login';
+		$this->loginVars[ 'format' ] = 'php';
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 		$this->snoopy->cookies = $this->getCookieHeaders( $this->snoopy->headers );
 		$response = unserialize( trim( $this->snoopy->results ) );
-		$this->loginVars[ 'lgtoken' ] = $response[ 'login' ][ 'token' ];
-					
+		$this->loginVars[ 'lgtoken' ] = $response[ 'query' ][ 'tokens' ][ 'logintoken' ];
+
+		$this->loginVars[ 'action' ] = 'login';
+		$this->loginVars[ 'lgname' ] = $this->ini[ 'wpName' ];
+		$this->loginVars[ 'lgpassword' ] = $this->ini[ 'wpPassword' ];
+		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 		return $this->snoopy->results;
 	}
 	
@@ -56,7 +76,7 @@ abstract class AbstractWrapper {
 	 * Logout
 	 */
 	public function logout() {
-		$this->initLoginVars();
+		// $this->initLoginVars();
 		$this->loginVars[ 'action' ] = 'logout';
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
 	}
@@ -78,23 +98,24 @@ abstract class AbstractWrapper {
 		$title = rawurlencode( str_replace( " ", "_", $title) );
 		
 		// authenticate
-		$this->loginVars[ 'action' ] = 'login';
-		$this->snoopy->submit( $this->apiURL, $this->loginVars );
-		$response = unserialize( trim( $this->snoopy->results ) );
-		if ( $response[ 'login' ][ 'result' ] != 'Success' ) throw new \Exception( 'Could not authenticate '. serialize($response) );
-		
-		// get the page by title
+		$this->login();
+
+		// Open the page to get the edit token
+		$this->loginVars = array();
 		$this->loginVars[ 'action' ] = 'query';
 		$this->loginVars[ 'prop' ] = 'info';
 		$this->loginVars[ 'titles' ] = $title;
-		$this->loginVars[ 'intoken' ] = 'edit';
+		$this->loginVars[ 'meta' ] = 'tokens';
+		$this->loginVars[ 'format' ] = 'json';
+		
 		$this->snoopy->submit( $this->apiURL, $this->loginVars );
-		$response = unserialize( trim( $this->snoopy->results ) );
+		$response =json_decode($this->snoopy->results,true);
 
 		// get the edittoken from the first page returned. 
-		// If the page does not exist, a page with index -1 is returned, with a new edittoken..
-		$page = array_shift( array_values( $response['query']['pages'] ) );
-		$token = $page['edittoken'];		
+		// If the page does not exist, a page with index -1 is returned, with a new edittoken.
+		// $page = array_shift( array_values( $response['query']['pages'] ) );
+		// $token = $page['edittoken'];
+		$token = $response['query']['tokens']["csrftoken"];
 
 		// Create the page
 		$this->loginVars[ 'action' ] = 'edit';
@@ -130,11 +151,14 @@ abstract class AbstractWrapper {
 	 */
 	public function fetchPage( $title ) {		
 		// authenticate
-		$this->snoopy->submit( $this->apiURL, $this->loginVars );		
+		// $this->snoopy->submit( $this->apiURL, $this->loginVars );
+
+		$this->login();
 
 		// fetch page
-		$this->loginVars[ 'action' ] = 'render';
-		$URL = $this->baseURL . "/index.php?title=" . $title;
+		$this->loginVars[ 'action' ] = 'parse';
+		$this->loginVars[ 'page' ] = $title;
+		$URL = $this->baseURL . "/api.php";
 		$this->snoopy->submit( $URL, $this->loginVars );
 		return $this->snoopy->results;
 	}

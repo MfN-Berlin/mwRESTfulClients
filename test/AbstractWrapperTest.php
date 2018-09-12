@@ -11,6 +11,7 @@ class AbstractWrapperTest extends PHPUnit_Framework_TestCase {
 	public $bot;
 	
 	public function setUp() {
+		error_reporting (E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED );
 		// path to configuration .ini file
 		$configPath =  __DIR__ . "/test.ini";
 		$ini = parse_ini_file( $configPath );
@@ -32,26 +33,17 @@ class AbstractWrapperTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testFetchPublicPage() {
-		$resp = $this->bot->fetchPage( '' );
+		$resp = $this->bot->fetchPage( 'Hauptseite' );
 		$this->assertNotNull( $resp );
-		$this->assertFalse( strpos( $resp, 'permissions-errors' ) !== false );
+		$this->assertFalse( strpos( $resp, 'error' ) !== false );
 	}
 	
 	public function testFetchPrivatePage() {
 		$this->bot->login();
-		$resp = $this->bot->fetchPage( 'Erweitert:Hauptseite' );
+		$resp = $this->bot->fetchPage( 'Glossar' );
 		$this->assertNotNull( $resp );
-		$this->assertFalse( strpos( $resp, 'permissions-errors' ) !== false );
+		$this->assertFalse( strpos( $resp, 'error' ) !== false );
 		$this->bot->logout();
 	}
-	
-	public function testLogout() {
-		$this->bot->login();
-		$resp = $this->bot->fetchPage( 'Erweitert:Hauptseite' );
-		$this->assertFalse( strpos( $resp, 'permissions-errors' ) !== false );
-		$this->bot->logout();
-		$resp = $this->bot->fetchPage( 'Erweitert:Hauptseite' );
-		$this->assertTrue( strpos( $resp, 'permissions-errors' ) !== false );
-	}
-	
+		
 }
